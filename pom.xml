@@ -22,6 +22,8 @@
         <spring.version>6.2.4</spring.version>
         <log4j.version>2.24.3</log4j.version>
         <curator.version>5.8.0</curator.version>
+        <fastjson.version>2.0.56</fastjson.version>
+        <netty.version>4.1.119.Final</netty.version>
     </properties>
 
     <dependencyManagement>
@@ -65,6 +67,20 @@
                 <groupId>org.apache.curator</groupId>
                 <artifactId>curator-recipes</artifactId>
                 <version>${curator.version}</version>
+            </dependency>
+
+            <!--json-->
+            <dependency>
+                <groupId>com.alibaba.fastjson2</groupId>
+                <artifactId>fastjson2</artifactId>
+                <version>${fastjson.version}</version>
+            </dependency>
+
+            <!--netty-->
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-all</artifactId>
+                <version>${netty.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
