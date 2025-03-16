@@ -19,7 +19,7 @@ public class ZRpcEncoder<T> extends MessageToByteEncoder<T> {
     }
 
     @Override
-    protected void encode(ChannelHandlerContext channelHandlerContext, Object obj, ByteBuf byteBuf) throws Exception {
+    protected void encode(ChannelHandlerContext channelHandlerContext, Object obj, ByteBuf byteBuf) {
         try {
             protocol.encode(obj, clazz, byteBuf);
         } catch (Exception e) {

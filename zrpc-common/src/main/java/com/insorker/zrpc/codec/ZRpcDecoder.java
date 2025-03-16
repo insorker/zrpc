@@ -22,7 +22,7 @@ public class ZRpcDecoder<T> extends ByteToMessageDecoder {
     }
 
     @Override
-    protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) throws Exception {
+    protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) {
         try {
             T obj = protocol.decode(byteBuf, clazz);
             Optional.ofNullable(obj).ifPresent(list::add);

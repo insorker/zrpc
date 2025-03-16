@@ -7,7 +7,7 @@ import com.insorker.zrpc.exceptions.ZRpcException;
  */
 public interface RpcServer {
 
-    public void start() throws ZRpcException;
+    void start() throws ZRpcException;
 
-    public void stop() throws ZRpcException;
+    void stop() throws ZRpcException;
 }
