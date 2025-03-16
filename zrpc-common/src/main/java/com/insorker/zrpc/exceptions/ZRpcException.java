@@ -3,9 +3,9 @@ package com.insorker.zrpc.exceptions;
 /**
  * rpc 异常类
  */
-public class RpcException extends RuntimeException {
+public class ZRpcException extends RuntimeException {
 
-    public RpcException(String msg) {
+    public ZRpcException(String msg) {
         super(msg);
     }
 }

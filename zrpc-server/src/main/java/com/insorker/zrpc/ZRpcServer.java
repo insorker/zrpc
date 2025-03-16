@@ -1,7 +1,7 @@
 package com.insorker.zrpc;
 
 import com.insorker.zrpc.core.RpcServer;
-import com.insorker.zrpc.exceptions.RpcException;
+import com.insorker.zrpc.exceptions.ZRpcException;
 
 public class ZRpcServer implements RpcServer {
 
@@ -10,12 +10,12 @@ public class ZRpcServer implements RpcServer {
     }
 
     @Override
-    public void start() throws RpcException {
+    public void start() throws ZRpcException {
 
     }
 
     @Override
-    public void stop() throws RpcException {
+    public void stop() throws ZRpcException {
 
     }
 }
