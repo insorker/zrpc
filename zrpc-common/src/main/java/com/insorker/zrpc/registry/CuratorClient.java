@@ -47,6 +47,10 @@ public final class CuratorClient {
         client.delete().forPath(path);
     }
 
+    public byte[] get(String path) throws Exception {
+        return client.getData().forPath(path);
+    }
+
     public void close() {
         if (client != null) {
             client.close();

@@ -9,21 +9,19 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 
-import java.util.concurrent.ThreadPoolExecutor;
-
 public class ZRpcServerInitializer extends ChannelInitializer<SocketChannel> {
 
     private final ZRpcDecoder<ZRpcRequest> decoder;
     private final ZRpcEncoder<ZRpcResponse> encoder;
 
-    public ZRpcServerInitializer(ZRpcDecoder<ZRpcRequest> decoder, ZRpcEncoder<ZRpcResponse> encoder, ThreadPoolExecutor executor) {
+    public ZRpcServerInitializer(ZRpcDecoder<ZRpcRequest> decoder, ZRpcEncoder<ZRpcResponse> encoder) {
         this.decoder = decoder;
         this.encoder = encoder;
     }
 
     public ZRpcServerInitializer() {
-        this.decoder = new ZRpcDecoder<>(new JsonProtocol<>(), ZRpcRequest.class);
-        this.encoder = new ZRpcEncoder<>(new JsonProtocol<>(), ZRpcResponse.class);
+        this(new ZRpcDecoder<>(new JsonProtocol<>(), ZRpcRequest.class),
+                new ZRpcEncoder<>(new JsonProtocol<>(), ZRpcResponse.class));
     }
 
     @Override

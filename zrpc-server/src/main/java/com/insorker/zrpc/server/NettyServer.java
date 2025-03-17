@@ -41,7 +41,7 @@ public class NettyServer {
         return serviceMap.keySet();
     }
 
-    public void start(String host, int port) {
+    public void start() {
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         ServerBootstrap bootstrap = new ServerBootstrap();

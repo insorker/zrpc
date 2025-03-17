@@ -14,6 +14,9 @@ public class ZRpcEncoder<T> extends MessageToByteEncoder<T> {
     private final Class<T> clazz;
 
     public ZRpcEncoder(ZRpcProtocol<T> protocol, Class<T> clazz) {
+        // preventing generic type erasure
+        super(clazz);
+
         this.protocol = protocol;
         this.clazz = clazz;
     }

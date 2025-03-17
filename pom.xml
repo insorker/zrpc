@@ -12,6 +12,7 @@
         <module>zrpc-common</module>
         <module>zrpc-server</module>
         <module>zrpc-client</module>
+        <module>zrpc-test</module>
     </modules>
 
     <properties>
