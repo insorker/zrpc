@@ -3,27 +3,25 @@ package io.github.insorker.zrpc.common.registry;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.curator.framework.recipes.cache.CuratorCache;
+import org.apache.curator.framework.recipes.cache.CuratorCacheListener;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.zookeeper.CreateMode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import javax.imageio.spi.ServiceRegistry;
+import java.util.List;
 
 public final class CuratorClient {
 
-    private static final Logger logger = LoggerFactory.getLogger(ServiceRegistry.class);
-    static int ZK_SESSION_TIMEOUT = 5000;
-    static int ZK_CONNECTION_TIMEOUT = 5000;
-    static String ZK_NAMESPACE = "zrpc";
-    static String ZK_REGISTRY_PATH = "/registry";
-    static String ZK_DATA_PATH = ZK_REGISTRY_PATH + "/data";
+    public static int ZK_SESSION_TIMEOUT = 5000;
+    public static int ZK_CONNECTION_TIMEOUT = 5000;
+    public static String ZK_NAMESPACE = "zrpc";
+    public static String ZK_SERVICE_PATH = "/service";
 
     private final CuratorFramework client;
 
-    public CuratorClient(String connectString, String namespace, int sessionTimeout, int connectTimeout, RetryPolicy retryPolicy) {
+    public CuratorClient(String registryAddress, String namespace, int sessionTimeout, int connectTimeout, RetryPolicy retryPolicy) {
         client = CuratorFrameworkFactory.builder()
-                .connectString(connectString)
+                .connectString(registryAddress)
                 .namespace(namespace)
                 .sessionTimeoutMs(sessionTimeout)
                 .connectionTimeoutMs(connectTimeout)
@@ -32,23 +30,41 @@ public final class CuratorClient {
         client.start();
     }
 
-    public CuratorClient(String connectString) {
-        this(connectString, ZK_NAMESPACE, ZK_SESSION_TIMEOUT, ZK_CONNECTION_TIMEOUT, new ExponentialBackoffRetry(1000, 10));
+    public CuratorClient(String registryAddress) {
+        this( registryAddress, ZK_NAMESPACE, ZK_SESSION_TIMEOUT, ZK_CONNECTION_TIMEOUT, new ExponentialBackoffRetry(1000, 10));
     }
 
     public String create(String path, byte[] data) throws Exception {
         return client.create()
                 .creatingParentsIfNeeded()
                 .withMode(CreateMode.EPHEMERAL)
-                .forPath(ZK_DATA_PATH + "/" + path, data);
+                .forPath(ZK_SERVICE_PATH + "/" + path, data);
     }
 
     public void remove(String path) throws Exception {
         client.delete().forPath(path);
     }
 
-    public byte[] get(String path) throws Exception {
+    public boolean exist(String path) throws Exception {
+        return client.checkExists().forPath(path) != null;
+    }
+
+    public void setData(String path, byte[] data) throws Exception {
+        client.setData().forPath(path, data);
+    }
+
+    public byte[] getData(String path) throws Exception {
         return client.getData().forPath(path);
+    }
+
+    public List<String> getChildren(String path) throws Exception {
+        return client.getChildren().forPath(path);
+    }
+
+    public void watchChildren(String path, CuratorCacheListener listener) {
+        CuratorCache curatorCache = CuratorCache.build(client, path);
+        curatorCache.listenable().addListener(listener);
+        curatorCache.start();
     }
 
     public void close() {
