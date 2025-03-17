@@ -1,6 +1,6 @@
 package io.github.insorker.zrpc.server.server;
 
-import io.github.insorker.zrpc.server.registry.ServiceRegistry;
+import io.github.insorker.zrpc.common.registry.ServerInfo;
 import io.github.insorker.zrpc.server.handler.ZRpcServerInitializer;
 import io.github.insorker.zrpc.common.registry.ServiceInfo;
 import io.netty.bootstrap.ServerBootstrap;
@@ -18,23 +18,21 @@ public class NettyServer {
 
     private static final Logger logger = LoggerFactory.getLogger(NettyServer.class);
 
-    private final String host;
-    private final int port;
+    private final ServerInfo serverInfo;
     private final ServiceRegistry serviceRegistry;
     private final Map<ServiceInfo, Object> serviceMap = new HashMap<>();
 
     public NettyServer(String host, int port, ServiceRegistry serviceRegistry) {
-        this.host = host;
-        this.port = port;
+        this.serverInfo = new ServerInfo(host, port);
         this.serviceRegistry = serviceRegistry;
     }
 
-    public void addService(String serviceName, Object serviceBean) {
-        ServiceInfo serviceInfo = new ServiceInfo(host, port, serviceName);
-
+    public void addService(ServiceInfo serviceInfo, Object serviceBean) {
         logger.info("Add service {}", serviceInfo);
+
+        serverInfo.addService(serviceInfo);
         serviceMap.put(serviceInfo, serviceBean);
-        serviceRegistry.register(serviceInfo);
+        serviceRegistry.register(serverInfo);
     }
 
     public Set<ServiceInfo> getServices() {
@@ -49,7 +47,7 @@ public class NettyServer {
         bootstrap.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
                 .childHandler(new ZRpcServerInitializer());
-        bootstrap.bind(host, port);
+        bootstrap.bind(serverInfo.getHost(), serverInfo.getPort());
     }
 
     public void stop() {

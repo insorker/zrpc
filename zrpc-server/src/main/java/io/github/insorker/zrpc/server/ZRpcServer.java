@@ -1,7 +1,8 @@
 package io.github.insorker.zrpc.server;
 
 import io.github.insorker.zrpc.common.annotation.ZRpcService;
-import io.github.insorker.zrpc.server.registry.ServiceRegistry;
+import io.github.insorker.zrpc.common.registry.ServiceInfo;
+import io.github.insorker.zrpc.server.server.ServiceRegistry;
 import io.github.insorker.zrpc.server.server.NettyServer;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -21,7 +22,7 @@ public class ZRpcServer extends NettyServer implements ApplicationContextAware {
 
         serviceBeanMap.values().forEach(serviceBean -> {
             ZRpcService annotation = serviceBean.getClass().getAnnotation(ZRpcService.class);
-            addService(annotation.value().getName(), serviceBean);
+            addService(new ServiceInfo(annotation.value().getName()), serviceBean);
         });
     }
 }

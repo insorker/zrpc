@@ -1,7 +1,7 @@
-package io.github.insorker.zrpc.server.registry;
+package io.github.insorker.zrpc.server.server;
 
 import io.github.insorker.zrpc.common.registry.CuratorClient;
-import io.github.insorker.zrpc.common.registry.ServiceInfo;
+import io.github.insorker.zrpc.common.registry.ServerInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,14 +18,20 @@ public class ServiceRegistry {
         curatorClient = new CuratorClient(registryAddress);
     }
 
-    public void register(ServiceInfo serviceInfo) {
+    public void register(ServerInfo serverInfo) {
         try {
-            String path = curatorClient.create(
-                    String.valueOf(serviceInfo.hashCode()),
-                    serviceInfo.toJSONBytes()
-            );
+            String path = String.valueOf(serverInfo.hashCode());
+            byte[] data = serverInfo.toJSONBytes();
+
             pathSet.add(path);
-            logger.info("Register new service on {}:{}", serviceInfo.getHost(), serviceInfo.getPort());
+            if (curatorClient.exist(path)) {
+                curatorClient.setData(path, data);
+            }
+            else {
+                curatorClient.create(path, data);
+            }
+
+            logger.info("Register new service on {}:{}", serverInfo.getHost(), serverInfo.getPort());
         } catch (Exception e) {
             logger.error("Fail to register service, exception: {}", e.getMessage());
         }
