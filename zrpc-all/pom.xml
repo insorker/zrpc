@@ -9,7 +9,8 @@
         <version>0.1.0</version>
     </parent>
 
-    <artifactId>zrpc-client</artifactId>
+    <groupId>com.insorker.zrpc</groupId>
+    <artifactId>zrpc-all</artifactId>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -18,10 +19,17 @@
     </properties>
 
     <dependencies>
-        <!--log-->
         <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-slf4j2-impl</artifactId>
+            <groupId>io.github.insorker</groupId>
+            <artifactId>zrpc-client</artifactId>
+            <version>0.1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.github.insorker</groupId>
+            <artifactId>zrpc-server</artifactId>
+            <version>0.1.0</version>
         </dependency>
     </dependencies>
+
 </project>
