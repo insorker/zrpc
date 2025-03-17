@@ -26,20 +26,6 @@ public abstract class ZRpcProtocol<T> {
      * Decode ByteBuf, return null if failed.
      */
     public T decode(ByteBuf byteBuf, Class<T> cls) throws ZRpcException {
-        // check protocol header
-        if (byteBuf.readableBytes() < HEADER_LENGTH) {
-            return null;
-        }
-
-        byteBuf.markReaderIndex();
-
-        // check protocol data
-        int dataLength = byteBuf.readInt();
-        if (byteBuf.readableBytes() < dataLength) {
-            byteBuf.resetReaderIndex();
-            return null;
-        }
-
         byte[] data = new byte[byteBuf.readableBytes()];
         byteBuf.readBytes(data);
         return deserialize(data, cls);

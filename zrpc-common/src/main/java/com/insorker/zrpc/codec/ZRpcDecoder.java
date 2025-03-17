@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.Optional;
 
 public class ZRpcDecoder<T> extends ByteToMessageDecoder {
 
@@ -24,8 +23,7 @@ public class ZRpcDecoder<T> extends ByteToMessageDecoder {
     @Override
     protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) {
         try {
-            T obj = protocol.decode(byteBuf, clazz);
-            Optional.ofNullable(obj).ifPresent(list::add);
+            list.add(protocol.decode(byteBuf, clazz));
         } catch (Exception e) {
             logger.error("Decode error: " + e);
         }

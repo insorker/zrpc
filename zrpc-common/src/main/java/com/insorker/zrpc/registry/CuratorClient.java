@@ -17,7 +17,7 @@ public final class CuratorClient {
     static int ZK_CONNECTION_TIMEOUT = 5000;
     static String ZK_NAMESPACE = "zrpc";
     static String ZK_REGISTRY_PATH = "/registry";
-    static String ZK_DATA_PATH = "";
+    static String ZK_DATA_PATH = ZK_REGISTRY_PATH + "/data";
 
     private final CuratorFramework client;
 
@@ -39,8 +39,8 @@ public final class CuratorClient {
     public String create(String path, byte[] data) throws Exception {
         return client.create()
                 .creatingParentsIfNeeded()
-                .withMode(CreateMode.EPHEMERAL_SEQUENTIAL)
-                .forPath(path, data);
+                .withMode(CreateMode.EPHEMERAL)
+                .forPath(ZK_DATA_PATH + "/" + path, data);
     }
 
     public void remove(String path) throws Exception {

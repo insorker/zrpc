@@ -3,33 +3,34 @@ package com.insorker.zrpc.registry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ServiceRegistry {
 
     private static final Logger logger = LoggerFactory.getLogger(ServiceRegistry.class);
     private final CuratorClient curatorClient;
-    private final List<String> pathList = new ArrayList<>();
+    private final Set<String> pathSet = new HashSet<>();
 
-    private ServiceRegistry(String registryAddress) {
+    public ServiceRegistry(String registryAddress) {
         curatorClient = new CuratorClient(registryAddress);
     }
 
-    public void register(String host, int port) {
+    public void register(ServiceInfo serviceInfo) {
         try {
             String path = curatorClient.create(
-                    "",
-                    null
+                    String.valueOf(serviceInfo.hashCode()),
+                    serviceInfo.toJSONBytes()
             );
-            pathList.add(path);
-            logger.info("Register new service on {}:{}", host, port);
+            pathSet.add(path);
+            logger.info("Register new service on {}:{}", serviceInfo.getHost(), serviceInfo.getPort());
         } catch (Exception e) {
             logger.error("Fail to register service, exception: {}", e.getMessage());
         }
     }
 
     public void unregister(String path) {
+        logger.info("Unregister service: " + path);
         try {
             curatorClient.remove(path);
         } catch (Exception e) {
@@ -38,6 +39,8 @@ public class ServiceRegistry {
     }
 
     public void close() {
+        logger.info("Unregister all services");
+        pathSet.forEach(this::unregister);
         curatorClient.close();
     }
 }
