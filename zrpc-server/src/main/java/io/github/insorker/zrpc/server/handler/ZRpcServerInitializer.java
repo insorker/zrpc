@@ -1,5 +1,6 @@
 package io.github.insorker.zrpc.server.handler;
 
+import io.github.insorker.zrpc.common.codec.ZRpcBeat;
 import io.github.insorker.zrpc.common.codec.ZRpcDecoder;
 import io.github.insorker.zrpc.common.codec.ZRpcEncoder;
 import io.github.insorker.zrpc.common.protocol.JsonProtocol;
@@ -8,6 +9,9 @@ import io.github.insorker.zrpc.common.protocol.ZRpcResponse;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.timeout.IdleStateHandler;
+
+import java.util.concurrent.TimeUnit;
 
 public class ZRpcServerInitializer extends ChannelInitializer<SocketChannel> {
 
@@ -27,6 +31,7 @@ public class ZRpcServerInitializer extends ChannelInitializer<SocketChannel> {
     @Override
     protected void initChannel(SocketChannel socketChannel) {
         socketChannel.pipeline()
+                .addLast(new IdleStateHandler(0, 0, ZRpcBeat.BEAT_TIMEOUT, TimeUnit.SECONDS))
                 .addLast(new LengthFieldBasedFrameDecoder(65536, 0, 4, 0, 4))
                 .addLast(decoder)
                 .addLast(encoder)
