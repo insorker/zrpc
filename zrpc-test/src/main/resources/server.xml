@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!--scan service package-->
+    <context:component-scan base-package="io.github.insorker.zrpc.test.service"/>
+
+    <context:property-placeholder location="classpath:zrpc.properties"/>
+
+    <bean id="ZRpcServer" class="io.github.insorker.zrpc.server.ZRpcServer">
+        <constructor-arg name="host" value="${zrpc.server.host}"/>
+        <constructor-arg name="port" value="${zrpc.server.port}"/>
+        <constructor-arg name="registryAddress" value="${zrpc.server.registry.address}"/>
+    </bean>
+
+</beans>

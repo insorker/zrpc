@@ -30,9 +30,9 @@ public class NettyServer extends ServiceRegistry {
     public void addService(ServiceInfo serviceInfo, Object serviceBean) {
         logger.info("Add service {}", serviceInfo);
 
-        register(serverInfo);
         serverInfo.addService(serviceInfo);
         serviceMap.put(serviceInfo, serviceBean);
+        register(serverInfo);
     }
 
     public Set<ServiceInfo> getServices() {
