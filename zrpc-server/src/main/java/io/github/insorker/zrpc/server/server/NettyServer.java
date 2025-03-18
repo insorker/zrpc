@@ -44,7 +44,7 @@ public class NettyServer extends ServiceRegistry {
 
         bootstrap.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
-                .childHandler(new ZRpcServerInitializer());
+                .childHandler(new ZRpcServerInitializer(serviceMap));
         bootstrap.bind(serverInfo.getHost(), serverInfo.getPort());
     }
 
