@@ -5,6 +5,7 @@ import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.recipes.cache.CuratorCache;
 import org.apache.curator.framework.recipes.cache.CuratorCacheListener;
+import org.apache.curator.framework.state.ConnectionStateListener;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.zookeeper.CreateMode;
 
@@ -72,6 +73,10 @@ public final class CuratorClient {
         CuratorCache curatorCache = CuratorCache.build(client, path);
         curatorCache.listenable().addListener(listener);
         curatorCache.start();
+    }
+
+    public void addConnectionStateListener(ConnectionStateListener connectionStateListener) {
+        client.getConnectionStateListenable().addListener(connectionStateListener);
     }
 
     public void close() {
