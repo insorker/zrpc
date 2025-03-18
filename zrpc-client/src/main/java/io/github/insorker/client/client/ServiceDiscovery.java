@@ -15,8 +15,8 @@ import java.util.Map;
 public class ServiceDiscovery {
 
     private static final Logger logger = LoggerFactory.getLogger(ServiceDiscovery.class);
+    protected final Map<ServiceInfo, SocketInfo> serviceSocketMap = new HashMap<>();
     private final CuratorClient curatorClient;
-    private final Map<ServiceInfo, SocketInfo> serviceInfoMap = new HashMap<>();
 
     public ServiceDiscovery(String registryAddress) {
         this.curatorClient = new CuratorClient(registryAddress);
@@ -26,20 +26,21 @@ public class ServiceDiscovery {
 
             for (String node : nodeList) {
                 byte[] data = curatorClient.getData(CuratorClient.ZK_SERVICE_PATH + "/" + node);
-                updateServiceInfoMap(ServerInfo.parseObject(data));
+                initServer(ServerInfo.parseObject(data));
             }
 
             curatorClient.watchChildren(CuratorClient.ZK_SERVICE_PATH, (type, oldData, newData) -> {
-                ServerInfo serverInfo = ServerInfo.parseObject(newData.getData());
+                ServerInfo oldServerInfo = ServerInfo.parseObject(oldData.getData());
+                ServerInfo newServerInfo = ServerInfo.parseObject(newData.getData());
 
                 if (type.name().equals(CuratorCacheListener.Type.NODE_CREATED.name())) {
-                    updateNodeCreated(serverInfo);
+                    updateNodeCreated(newServerInfo);
                 }
                 else if (type.name().equals(CuratorCacheListener.Type.NODE_CHANGED.name())) {
-                    updateNodeChanged(serverInfo);
+                    updateNodeChanged(newServerInfo, oldServerInfo);
                 }
                 else if (type.name().equals(CuratorCacheListener.Type.NODE_DELETED.name())) {
-                    updateNodeDeleted(serverInfo);
+                    updateNodeDeleted(newServerInfo);
                 }
             });
         } catch (Exception e) {
@@ -47,25 +48,37 @@ public class ServiceDiscovery {
         }
     }
 
-    protected void updateServiceInfoMap(ServerInfo serverInfo) {
+    public void close() {
+        curatorClient.close();
+    }
+
+    protected void initServer(ServerInfo serverInfo) {
         serverInfo.getServiceInfoList().forEach(serviceInfo -> {
-            serviceInfoMap.put(serviceInfo, serverInfo.getSocketInfo());
+            serviceSocketMap.put(serviceInfo, serverInfo.getSocketInfo());
         });
     }
 
     protected void updateNodeCreated(ServerInfo serverInfo) {
-        updateServiceInfoMap(serverInfo);
+        serverInfo.getServiceInfoList().forEach(serviceInfo -> {
+            serviceSocketMap.putIfAbsent(serviceInfo, serverInfo.getSocketInfo());
+        });
     }
 
-    protected void updateNodeChanged(ServerInfo serverInfo) {
-        updateServiceInfoMap(serverInfo);
+    protected void updateNodeChanged(ServerInfo newServerInfo, ServerInfo oldServerInfo) {
+        List<ServiceInfo> newServiceInfoList = newServerInfo.getServiceInfoList();
+        List<ServiceInfo> oldServiceInfoList = oldServerInfo.getServiceInfoList();
+
+        oldServiceInfoList.forEach(serviceInfo -> {
+            if (!newServiceInfoList.contains(serviceInfo)) {
+                serviceSocketMap.remove(serviceInfo);
+            }
+        });
+        newServiceInfoList.forEach(serviceInfo -> {
+            serviceSocketMap.put(serviceInfo, newServerInfo.getSocketInfo());
+        });
     }
 
     protected void updateNodeDeleted(ServerInfo serverInfo) {
-        serverInfo.getServiceInfoList().forEach(serviceInfoMap::remove);
-    }
-
-    public void close() {
-        curatorClient.close();
+        serverInfo.getServiceInfoList().forEach(serviceSocketMap::remove);
     }
 }
