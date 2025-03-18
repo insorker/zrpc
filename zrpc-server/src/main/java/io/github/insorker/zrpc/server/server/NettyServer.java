@@ -14,25 +14,23 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class NettyServer {
+public class NettyServer extends ServiceRegistry {
 
     private static final Logger logger = LoggerFactory.getLogger(NettyServer.class);
-
     private final ServerInfo serverInfo;
-    private final ServiceRegistry serviceRegistry;
     private final Map<ServiceInfo, Object> serviceMap = new HashMap<>();
 
-    public NettyServer(String host, int port, ServiceRegistry serviceRegistry) {
+    public NettyServer(String host, int port, String registryAddress) {
+        super(registryAddress);
         this.serverInfo = new ServerInfo(host, port);
-        this.serviceRegistry = serviceRegistry;
     }
 
     public void addService(ServiceInfo serviceInfo, Object serviceBean) {
         logger.info("Add service {}", serviceInfo);
 
+        register(serverInfo);
         serverInfo.addService(serviceInfo);
         serviceMap.put(serviceInfo, serviceBean);
-        serviceRegistry.register(serverInfo);
     }
 
     public Set<ServiceInfo> getServices() {
@@ -51,6 +49,6 @@ public class NettyServer {
     }
 
     public void stop() {
-        serviceRegistry.close();
+        close();
     }
 }

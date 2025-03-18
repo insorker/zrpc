@@ -11,14 +11,11 @@ public class ServerInfo implements Serializable {
 
     @Serial
     private static final long serialVersionUID = -2197578582408622414L;
-
-    private String host;
-    private int port;
+    private SocketInfo socketInfo;
     private List<ServiceInfo> serviceInfoList;
 
     public ServerInfo(String host, int port) {
-        this.host = host;
-        this.port = port;
+        socketInfo = new SocketInfo(host, port);
     }
 
     public byte[] toJSONBytes() {
@@ -33,42 +30,41 @@ public class ServerInfo implements Serializable {
         serviceInfoList.add(serviceInfo);
     }
 
+    public String getHost() {
+        return socketInfo.getHost();
+    }
+
+    public int getPort() {
+        return socketInfo.getPort();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ServerInfo that = (ServerInfo) o;
-        return port == that.port && Objects.equals(host, that.host) && Objects.equals(serviceInfoList, that.serviceInfoList);
+        return Objects.equals(socketInfo, that.socketInfo) && Objects.equals(serviceInfoList, that.serviceInfoList);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(host, port);
+        return Objects.hash(socketInfo, serviceInfoList);
     }
 
     @Override
     public String toString() {
         return "ServerInfo{" +
-                "host='" + host + '\'' +
-                ", port=" + port +
-                ", services=" + serviceInfoList +
+                "socketInfo=" + socketInfo +
+                ", serviceInfoList=" + serviceInfoList +
                 '}';
     }
 
-    public String getHost() {
-        return host;
+    public SocketInfo getSocketInfo() {
+        return socketInfo;
     }
 
-    public void setHost(String host) {
-        this.host = host;
-    }
-
-    public int getPort() {
-        return port;
-    }
-
-    public void setPort(int port) {
-        this.port = port;
+    public void setSocketInfo(SocketInfo socketInfo) {
+        this.socketInfo = socketInfo;
     }
 
     public List<ServiceInfo> getServiceInfoList() {

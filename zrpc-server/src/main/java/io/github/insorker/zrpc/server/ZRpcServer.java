@@ -2,7 +2,6 @@ package io.github.insorker.zrpc.server;
 
 import io.github.insorker.zrpc.common.annotation.ZRpcService;
 import io.github.insorker.zrpc.common.registry.ServiceInfo;
-import io.github.insorker.zrpc.server.server.ServiceRegistry;
 import io.github.insorker.zrpc.server.server.NettyServer;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -13,7 +12,7 @@ import java.util.Map;
 public class ZRpcServer extends NettyServer implements ApplicationContextAware {
 
     public ZRpcServer(String host, int port, String registryAddress) {
-        super(host, port, new ServiceRegistry(registryAddress));
+        super(host, port, registryAddress);
     }
 
     @Override

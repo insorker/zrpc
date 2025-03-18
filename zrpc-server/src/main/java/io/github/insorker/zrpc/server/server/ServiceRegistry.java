@@ -20,7 +20,7 @@ public class ServiceRegistry {
 
     public void register(ServerInfo serverInfo) {
         try {
-            String path = String.valueOf(serverInfo.hashCode());
+            String path = String.valueOf(serverInfo.getSocketInfo().hashCode());
             byte[] data = serverInfo.toJSONBytes();
 
             pathSet.add(path);
