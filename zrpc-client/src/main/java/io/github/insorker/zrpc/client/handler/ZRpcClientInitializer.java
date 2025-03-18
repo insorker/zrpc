@@ -1,4 +1,4 @@
-package io.github.insorker.client.handler;
+package io.github.insorker.zrpc.client.handler;
 
 import io.github.insorker.zrpc.common.codec.ZRpcDecoder;
 import io.github.insorker.zrpc.common.codec.ZRpcEncoder;

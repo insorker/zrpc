@@ -1,5 +1,6 @@
 package io.github.insorker.zrpc.test.server;
 
+import io.github.insorker.zrpc.common.registry.ServiceInfo;
 import io.github.insorker.zrpc.server.ZRpcServer;
 
 public class ZRpcServerTest {
@@ -9,8 +10,7 @@ public class ZRpcServerTest {
         String registryAddress = "1.94.213.53:2181";
 
         ZRpcServer zRpcServer = new ZRpcServer(host, port, registryAddress);
-
-        zRpcServer.addService("Hello", "Hello");
+        zRpcServer.addService(new ServiceInfo("Hello"), "Hello");
         zRpcServer.start();
     }
 }

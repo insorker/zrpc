@@ -35,33 +35,40 @@ public final class CuratorClient {
     }
 
     public String create(String path, byte[] data) throws Exception {
+        path = pathWrap(path);
         return client.create()
                 .creatingParentsIfNeeded()
                 .withMode(CreateMode.EPHEMERAL)
-                .forPath(ZK_SERVICE_PATH + "/" + path, data);
+                .forPath(path, data);
     }
 
     public void remove(String path) throws Exception {
+        path = pathWrap(path);
         client.delete().forPath(path);
     }
 
     public boolean exist(String path) throws Exception {
+        path = pathWrap(path);
         return client.checkExists().forPath(path) != null;
     }
 
     public void setData(String path, byte[] data) throws Exception {
+        path = pathWrap(path);
         client.setData().forPath(path, data);
     }
 
     public byte[] getData(String path) throws Exception {
+        path = pathWrap(path);
         return client.getData().forPath(path);
     }
 
     public List<String> getChildren(String path) throws Exception {
+        path = pathWrap(path);
         return client.getChildren().forPath(path);
     }
 
     public void watchChildren(String path, CuratorCacheListener listener) {
+        path = pathWrap(path);
         CuratorCache curatorCache = CuratorCache.build(client, path);
         curatorCache.listenable().addListener(listener);
         curatorCache.start();
@@ -71,5 +78,12 @@ public final class CuratorClient {
         if (client != null) {
             client.close();
         }
+    }
+
+    private String pathWrap(String path) {
+        if (path == null || path.isEmpty()) {
+            return ZK_SERVICE_PATH;
+        }
+        return ZK_SERVICE_PATH + "/" + path;
     }
 }

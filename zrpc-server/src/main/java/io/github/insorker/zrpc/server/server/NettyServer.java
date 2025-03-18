@@ -19,6 +19,8 @@ public class NettyServer extends ServiceRegistry {
     private static final Logger logger = LoggerFactory.getLogger(NettyServer.class);
     private final ServerInfo serverInfo;
     private final Map<ServiceInfo, Object> serviceMap = new HashMap<>();
+    private final EventLoopGroup bossGroup = new NioEventLoopGroup();
+    private final EventLoopGroup workerGroup = new NioEventLoopGroup();
 
     public NettyServer(String host, int port, String registryAddress) {
         super(registryAddress);
@@ -38,8 +40,6 @@ public class NettyServer extends ServiceRegistry {
     }
 
     public void start() {
-        EventLoopGroup bossGroup = new NioEventLoopGroup();
-        EventLoopGroup workerGroup = new NioEventLoopGroup();
         ServerBootstrap bootstrap = new ServerBootstrap();
 
         bootstrap.group(bossGroup, workerGroup)
@@ -50,5 +50,7 @@ public class NettyServer extends ServiceRegistry {
 
     public void stop() {
         close();
+        bossGroup.shutdownGracefully();
+        workerGroup.shutdownGracefully();
     }
 }

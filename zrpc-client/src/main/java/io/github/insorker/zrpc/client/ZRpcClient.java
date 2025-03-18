@@ -1,33 +1,25 @@
-package io.github.insorker.client;
+package io.github.insorker.zrpc.client;
 
-import io.github.insorker.client.client.NettyClient;
-import io.github.insorker.zrpc.common.annotation.EnableZRpc;
+import io.github.insorker.zrpc.client.client.NettyClient;
 import io.github.insorker.zrpc.common.annotation.ZRpcReference;
 import io.github.insorker.zrpc.common.exceptions.ZRpcException;
-import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
-import org.aspectj.lang.reflect.MethodSignature;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.Map;
 
-public class ZRpcClient extends NettyClient implements ApplicationContextAware {
+public class ZRpcClient extends NettyClient implements ApplicationContextAware, DisposableBean {
 
-    private static final Logger logger = LoggerFactory.getLogger(ZRpcClient.class);
     private static volatile ZRpcClient instance;
 
     private ZRpcClient(String registryAddress) {
         super(registryAddress);
     }
 
-    static void newInstance(String registryAddress) {
+    public static void newInstance(String registryAddress) {
         if (instance == null) {
             synchronized (ZRpcClient.class) {
                 if (instance == null) {
@@ -61,23 +53,9 @@ public class ZRpcClient extends NettyClient implements ApplicationContextAware {
             }
         });
     }
-}
 
-@Aspect
-class ZRpcClientEnable {
-
-    @Before("@annotation(io.github.insorker.zrpc.common.annotation.EnableZRpc)")
-    public void initZRpcClient(JoinPoint joinPoint) {
-        // 获取方法签名
-        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
-        Method method = signature.getMethod();
-
-        // 获取方法上的注解
-        EnableZRpc annotation = method.getAnnotation(EnableZRpc.class);
-        if (annotation != null) {
-            String registryAddress = annotation.value();
-            // TODO: check if value is valid
-            ZRpcClient.newInstance(registryAddress);
-        }
+    @Override
+    public void destroy() {
+        this.stop();
     }
 }

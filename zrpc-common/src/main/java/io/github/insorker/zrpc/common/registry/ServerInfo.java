@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSON;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -16,6 +17,7 @@ public class ServerInfo implements Serializable {
 
     public ServerInfo(String host, int port) {
         socketInfo = new SocketInfo(host, port);
+        serviceInfoList = new ArrayList<>();
     }
 
     public byte[] toJSONBytes() {
