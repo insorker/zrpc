@@ -32,10 +32,15 @@ public class ServiceProxy<T, R> implements InvocationHandler, ZRpcService<T, R> 
         request.setParameters(method.getParameters());
 
         ServiceInfo serviceInfo = new ServiceInfo(request.getClassName());
-        ZRpcClientHandler handler = ZRpcClient.getInstance().chooseHandler(serviceInfo);
-        ZRpcFuture future = handler.sendRequest(request);
 
-        return future.get();
+        try {
+            ZRpcClientHandler handler = ZRpcClient.getInstance().chooseHandler(serviceInfo);
+            ZRpcFuture future = handler.sendRequest(request);
+            return future.get();
+        } catch (Exception e) {
+            logger.error("Proxy invoke error: ", e);
+            return null;
+        }
     }
 
     @Override

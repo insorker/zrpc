@@ -22,6 +22,7 @@ public class ZRpcFuture implements Future<Object> {
         lock.lock();
         try {
             this.isDone = true;
+            doneCondition.signalAll();
             this.response = response;
         } finally {
             lock.unlock();

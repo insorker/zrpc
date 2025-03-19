@@ -17,12 +17,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class ServiceDiscovery {
 
     private static final Logger logger = LoggerFactory.getLogger(ServiceDiscovery.class);
     protected final Map<ServiceInfo, SocketInfo> serviceSocketMap = new HashMap<>();
     protected final Map<SocketInfo, ZRpcClientHandler> socketHandlerMap = new HashMap<>();
+    protected final ReentrantLock lock = new ReentrantLock();
+    protected final Condition connectedCondition = lock.newCondition();
     private final CuratorClient curatorClient;
     private final Set<EventLoopGroup> groups = new HashSet<>();
 
@@ -99,7 +103,6 @@ public class ServiceDiscovery {
             socketHandlerMap.remove(oldSocketInfo);
             connectServer(newSocketInfo);
         }
-
     }
 
     protected void updateNodeDeleted(ServerInfo serverInfo) {
@@ -123,11 +126,22 @@ public class ServiceDiscovery {
             if (channelFuture.isSuccess()) {
                 ZRpcClientHandler handler = channelFuture.channel().pipeline().get(ZRpcClientHandler.class);
                 socketHandlerMap.put(socketInfo, handler);
+                signalAll();
+
                 logger.info("Connect to server {}.", socketInfo);
             }
             else {
                 logger.error("Cannot connect to server {}.", socketInfo);
             }
         });
+    }
+
+    private void signalAll() {
+        lock.lock();
+        try {
+            connectedCondition.signalAll();
+        } finally {
+            lock.unlock();
+        }
     }
 }
