@@ -4,6 +4,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.UUID;
 
 public class ZRpcRequest implements Serializable {
 
@@ -14,6 +15,22 @@ public class ZRpcRequest implements Serializable {
     private String methodName;
     private Class<?>[] parameterTypes;
     private Object[] parameters;
+
+    public ZRpcRequest() {
+        this.id = UUID.randomUUID().toString();
+    }
+
+    public ZRpcRequest(String className, String methodName, Object[] args) {
+        this.id = UUID.randomUUID().toString();
+        this.className = className;
+        this.methodName = methodName;
+        this.parameterTypes = new Class[args.length];
+        this.parameters = args;
+
+        for (int i = 0; i < args.length; i++) {
+            this.parameterTypes[i] = args[i].getClass();
+        }
+    }
 
     @Override
     public boolean equals(Object o) {

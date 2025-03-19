@@ -4,29 +4,26 @@ import io.github.insorker.zrpc.common.protocol.ZRpcResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class ZRpcFuture implements Future<Object> {
 
-    private static final Logger logger = LoggerFactory.getLogger(ZRpcClientHandler.class);
-    private ZRpcResponse response;
-    private final ReentrantLock lock;
-
-    public ZRpcFuture() {
-        this.response = null;
-        this.lock = new ReentrantLock();
-    }
+    private static final Logger logger = LoggerFactory.getLogger(ZRpcFuture.class);
+    private ZRpcResponse response = null;
+    private boolean isDone = false;
+    private final ReentrantLock lock = new ReentrantLock();
+    private final Condition doneCondition = lock.newCondition();
 
     public void setResponse(ZRpcResponse response) {
         lock.lock();
         try {
+            this.isDone = true;
             this.response = response;
-        }
-        finally {
+        } finally {
             lock.unlock();
         }
     }
@@ -43,27 +40,40 @@ public class ZRpcFuture implements Future<Object> {
 
     @Override
     public boolean isDone() {
-        return false;
-    }
-
-    @Override
-    public Object get() throws InterruptedException, ExecutionException {
         lock.lock();
         try {
-            if (response != null) {
-                return response.getResult();
-            }
-            else {
-                return null;
-
-            }
+            return isDone;
         } finally {
             lock.unlock();
         }
     }
 
     @Override
-    public Object get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-        return null;
+    public Object get() throws InterruptedException {
+        lock.lock();
+        try {
+            while (!isDone) {
+                doneCondition.await();
+            }
+            return response.getResult();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    @Override
+    public Object get(long timeout, TimeUnit unit) throws TimeoutException, InterruptedException {
+        lock.lock();
+        try {
+            if (!isDone) {
+                boolean success = doneCondition.await(timeout, unit);
+                if (!success) {
+                    throw new TimeoutException("Timeout waiting for result");
+                }
+            }
+            return response;
+        } finally {
+            lock.unlock();
+        }
     }
 }
