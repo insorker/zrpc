@@ -29,7 +29,7 @@ public class ServiceProxy<T, R> implements InvocationHandler, ZRpcService<T, R> 
         request.setClassName(method.getDeclaringClass().getName());
         request.setMethodName(method.getName());
         request.setParameterTypes(method.getParameterTypes());
-        request.setParameters(method.getParameters());
+        request.setParameters(args);
 
         ServiceInfo serviceInfo = new ServiceInfo(request.getClassName());
 

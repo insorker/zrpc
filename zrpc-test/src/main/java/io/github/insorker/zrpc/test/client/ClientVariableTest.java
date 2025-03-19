@@ -8,6 +8,7 @@ public class ClientVariableTest {
         ZRpcClient.newInstance("1.94.213.53:2181");
 
         PersonService service = ZRpcClient.createService(PersonService.class);
+        service.setName("insorker");
         System.out.println(service.getName());
     }
 }
