@@ -1,6 +1,7 @@
-package io.github.insorker.zrpc.common.protocol;
+package io.github.insorker.zrpc.common.protocol.json;
 
 import com.alibaba.fastjson2.JSON;
+import io.github.insorker.zrpc.common.protocol.ZRpcProtocol;
 
 public class JsonProtocol<T> extends ZRpcProtocol<T> {
 
