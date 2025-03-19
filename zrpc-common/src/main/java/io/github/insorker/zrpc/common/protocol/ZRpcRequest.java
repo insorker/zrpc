@@ -1,5 +1,7 @@
 package io.github.insorker.zrpc.common.protocol;
 
+import io.github.insorker.zrpc.common.registry.ServiceInfo;
+
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Arrays;
@@ -11,6 +13,7 @@ public class ZRpcRequest implements Serializable {
     @Serial
     private static final long serialVersionUID = -7079157869973225277L;
     private String id;
+    private ServiceInfo serviceInfo;
     private String className;
     private String methodName;
     private Class<?>[] parameterTypes;
@@ -20,8 +23,9 @@ public class ZRpcRequest implements Serializable {
         this.id = UUID.randomUUID().toString();
     }
 
-    public ZRpcRequest(String className, String methodName, Object[] args) {
+    public ZRpcRequest(ServiceInfo serviceInfo, String className, String methodName, Object[] args) {
         this.id = UUID.randomUUID().toString();
+        this.serviceInfo = serviceInfo;
         this.className = className;
         this.methodName = methodName;
         this.parameterTypes = new Class[args.length];
@@ -37,12 +41,12 @@ public class ZRpcRequest implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ZRpcRequest request = (ZRpcRequest) o;
-        return Objects.equals(id, request.id) && Objects.equals(className, request.className) && Objects.equals(methodName, request.methodName) && Arrays.equals(parameterTypes, request.parameterTypes) && Arrays.equals(parameters, request.parameters);
+        return Objects.equals(id, request.id) && Objects.equals(serviceInfo, request.serviceInfo) && Objects.equals(className, request.className) && Objects.equals(methodName, request.methodName) && Arrays.equals(parameterTypes, request.parameterTypes) && Arrays.equals(parameters, request.parameters);
     }
 
     @Override
     public int hashCode() {
-        int result = Objects.hash(id, className, methodName);
+        int result = Objects.hash(id, serviceInfo, className, methodName);
         result = 31 * result + Arrays.hashCode(parameterTypes);
         result = 31 * result + Arrays.hashCode(parameters);
         return result;
@@ -52,6 +56,7 @@ public class ZRpcRequest implements Serializable {
     public String toString() {
         return "ZRpcRequest{" +
                 "id='" + id + '\'' +
+                ", serviceInfo=" + serviceInfo +
                 ", className='" + className + '\'' +
                 ", methodName='" + methodName + '\'' +
                 ", parameterTypes=" + Arrays.toString(parameterTypes) +
@@ -65,6 +70,14 @@ public class ZRpcRequest implements Serializable {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public ServiceInfo getServiceInfo() {
+        return serviceInfo;
+    }
+
+    public void setServiceInfo(ServiceInfo serviceInfo) {
+        this.serviceInfo = serviceInfo;
     }
 
     public String getClassName() {

@@ -3,6 +3,7 @@ package io.github.insorker.zrpc.client;
 import io.github.insorker.zrpc.client.client.NettyClient;
 import io.github.insorker.zrpc.common.annotation.ZRpcReference;
 import io.github.insorker.zrpc.common.exceptions.ZRpcException;
+import io.github.insorker.zrpc.common.registry.ServiceInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -11,7 +12,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 import java.lang.reflect.Field;
-import java.util.Map;
 
 public class ZRpcClient extends NettyClient implements ApplicationContextAware, DisposableBean {
 
@@ -22,7 +22,7 @@ public class ZRpcClient extends NettyClient implements ApplicationContextAware, 
         super(registryAddress);
     }
 
-    public static void newInstance(String registryAddress) {
+    public static ZRpcClient newInstance(String registryAddress) {
         if (instance == null) {
             synchronized (ZRpcClient.class) {
                 if (instance == null) {
@@ -30,6 +30,7 @@ public class ZRpcClient extends NettyClient implements ApplicationContextAware, 
                 }
             }
         }
+        return instance;
     }
 
     public static ZRpcClient getInstance() {
@@ -41,9 +42,9 @@ public class ZRpcClient extends NettyClient implements ApplicationContextAware, 
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        Map<String, Object> referenceBeanMap = applicationContext.getBeansWithAnnotation(ZRpcReference.class);
+        String[] beanNames = applicationContext.getBeanDefinitionNames();
 
-        referenceBeanMap.keySet().forEach(beanName -> {
+        for (String beanName : beanNames) {
             Object bean = applicationContext.getBean(beanName);
             Field[] fields = bean.getClass().getDeclaredFields();
 
@@ -52,13 +53,13 @@ public class ZRpcClient extends NettyClient implements ApplicationContextAware, 
                 if (annotation != null) {
                     field.setAccessible(true);
                     try {
-                        field.set(bean, createService(field.getType()));
+                        field.set(bean, createService(new ServiceInfo(annotation.value()), field.getType()));
                     } catch (IllegalAccessException e) {
                         logger.error(e.toString());
                     }
                 }
             }
-        });
+        }
     }
 
     @Override

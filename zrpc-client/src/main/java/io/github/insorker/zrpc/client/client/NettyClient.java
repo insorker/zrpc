@@ -25,15 +25,15 @@ public class NettyClient extends ServiceDiscovery {
         super.close();
     }
 
-    public static <T, R> T createService(Class<T> cls) {
+    public static <T, R> T createService(ServiceInfo serviceInfo, Class<T> cls) {
         return (T) Proxy.newProxyInstance(
                 cls.getClassLoader(),
                 new Class<?>[]{cls},
-                new ServiceProxy<T, R>(cls));
+                new ServiceProxy<T, R>(serviceInfo, cls));
     }
 
-    public static <T, R> ZRpcService<T, R> createAsyncService(Class<T> cls) {
-        return new ServiceProxy<>(cls);
+    public static <T, R> ZRpcService<T, R> createAsyncService(ServiceInfo serviceInfo, Class<T> cls) {
+        return new ServiceProxy<>(serviceInfo, cls);
     }
 
     private void waitForHandler() {

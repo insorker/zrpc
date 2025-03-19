@@ -1,4 +1,4 @@
-package io.github.insorker.zrpc.test.service;
+package io.github.insorker.zrpc.test.variable.server;
 
 public interface PersonService {
 

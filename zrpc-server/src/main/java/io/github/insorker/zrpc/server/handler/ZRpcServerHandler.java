@@ -46,7 +46,7 @@ public class ZRpcServerHandler extends SimpleChannelInboundHandler<ZRpcRequest> 
 
     private Object handle(ZRpcRequest request) throws Throwable {
         String serviceName = request.getClassName();
-        Object serviceBean = serviceMap.get(new ServiceInfo(serviceName));
+        Object serviceBean = serviceMap.get(request.getServiceInfo());
 
         if (serviceName == null) {
             logger.error("Cannot find relative service by request {}", request);

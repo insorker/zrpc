@@ -1,11 +1,9 @@
-package io.github.insorker.zrpc.test.server;
+package io.github.insorker.zrpc.test.variable.server;
 
 import io.github.insorker.zrpc.common.registry.ServiceInfo;
 import io.github.insorker.zrpc.server.ZRpcServer;
-import io.github.insorker.zrpc.test.service.PersonService;
-import io.github.insorker.zrpc.test.service.impl.PersonServiceImpl;
 
-public class ServerVariableTest {
+public class VariableServer {
 
     public static void main(String[] args) {
         String host = "127.0.0.1";
@@ -14,7 +12,7 @@ public class ServerVariableTest {
 
         ZRpcServer server = new ZRpcServer(host, port, registryAddress);
         server.addService(new ServiceInfo("HelloWorld"), "HelloWorld");
-        server.addService(new ServiceInfo(PersonService.class.getName()), new PersonServiceImpl("Wang"));
+        server.addService(new ServiceInfo("PersonService"), new PersonServiceImpl("Harry Potter"));
         server.start();
     }
 }

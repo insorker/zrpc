@@ -11,27 +11,26 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.util.UUID;
 
 public class ServiceProxy<T, R> implements InvocationHandler, ZRpcService<T, R> {
 
     private static final Logger logger = LoggerFactory.getLogger(ServiceProxy.class);
+    private final ServiceInfo serviceInfo;
     private final Class<T> clazz;
 
-    public ServiceProxy(Class<T> cls) {
+    public ServiceProxy(ServiceInfo serviceInfo, Class<T> cls) {
+        this.serviceInfo = serviceInfo;
         this.clazz = cls;
     }
 
     @Override
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+    public Object invoke(Object proxy, Method method, Object[] args) {
         ZRpcRequest request = new ZRpcRequest();
-        request.setId(UUID.randomUUID().toString());
+        request.setServiceInfo(serviceInfo);
         request.setClassName(method.getDeclaringClass().getName());
         request.setMethodName(method.getName());
         request.setParameterTypes(method.getParameterTypes());
         request.setParameters(args);
-
-        ServiceInfo serviceInfo = new ServiceInfo(request.getClassName());
 
         try {
             ZRpcClientHandler handler = ZRpcClient.getInstance().chooseHandler(serviceInfo);
@@ -47,7 +46,7 @@ public class ServiceProxy<T, R> implements InvocationHandler, ZRpcService<T, R> 
     public ZRpcFuture call(String functionName, Object... args) throws ZRpcException {
         String serviceName = clazz.getName();
         ZRpcClientHandler handler = ZRpcClient.getInstance().chooseHandler(new ServiceInfo(serviceName));
-        ZRpcRequest request = new ZRpcRequest(this.clazz.getName(), functionName, args);
+        ZRpcRequest request = new ZRpcRequest(serviceInfo, clazz.getName(), functionName, args);
         return handler.sendRequest(request);
     }
 

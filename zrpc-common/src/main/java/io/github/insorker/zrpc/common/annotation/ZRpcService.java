@@ -12,5 +12,5 @@ import java.lang.annotation.Target;
 @Component
 public @interface ZRpcService {
 
-    Class<?> value();
+    String value();
 }

@@ -23,7 +23,7 @@ public class ZRpcServer extends NettyServer implements ApplicationContextAware, 
 
         serviceBeanMap.values().forEach(serviceBean -> {
             ZRpcService annotation = serviceBean.getClass().getAnnotation(ZRpcService.class);
-            addService(new ServiceInfo(annotation.value().getName()), serviceBean);
+            addService(new ServiceInfo(annotation.value()), serviceBean);
         });
     }
 

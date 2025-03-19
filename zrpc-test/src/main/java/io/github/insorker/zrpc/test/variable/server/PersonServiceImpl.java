@@ -1,10 +1,12 @@
-package io.github.insorker.zrpc.test.service.impl;
-
-import io.github.insorker.zrpc.test.service.PersonService;
+package io.github.insorker.zrpc.test.variable.server;
 
 public class PersonServiceImpl implements PersonService {
 
-    private String name;
+    private String name = "nobody";
+
+    public PersonServiceImpl() {
+
+    }
 
     public PersonServiceImpl(String name) {
         this.name = name;
