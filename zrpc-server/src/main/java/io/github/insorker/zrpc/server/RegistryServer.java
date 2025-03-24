@@ -1,8 +1,9 @@
-package io.github.insorker.zrpc.server.server;
+package io.github.insorker.zrpc.server;
 
 import io.github.insorker.zrpc.common.registry.ServerInfo;
-import io.github.insorker.zrpc.server.handler.ZRpcServerInitializer;
 import io.github.insorker.zrpc.common.registry.ServiceInfo;
+import io.github.insorker.zrpc.server.handler.ZRpcServerInitializer;
+import io.github.insorker.zrpc.server.registry.ZookeeperRegistry;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -12,21 +13,20 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
-public class NettyServer extends ServiceRegistry {
+public class RegistryServer extends ZookeeperRegistry implements SpringServer {
 
-    private static final Logger logger = LoggerFactory.getLogger(NettyServer.class);
-    private final ServerInfo serverInfo;
+    private static final Logger logger = LoggerFactory.getLogger(RegistryServer.class);
     private final Map<ServiceInfo, Object> serviceMap = new HashMap<>();
     private final EventLoopGroup bossGroup = new NioEventLoopGroup();
     private final EventLoopGroup workerGroup = new NioEventLoopGroup();
 
-    public NettyServer(String host, int port, String registryAddress) {
+    public RegistryServer(String host, int port, String registryAddress) {
         super(registryAddress);
-        this.serverInfo = new ServerInfo(host, port);
+        serverInfo = new ServerInfo(host, port);
     }
 
+    @Override
     public void addService(ServiceInfo serviceInfo, Object serviceBean) {
         logger.info("Add service {}", serviceInfo);
 
@@ -35,10 +35,18 @@ public class NettyServer extends ServiceRegistry {
         register(serverInfo);
     }
 
-    public Set<ServiceInfo> getServices() {
-        return serviceMap.keySet();
+    @Override
+    public void removeService(ServiceInfo serviceInfo) {
+        logger.info("Remove service {}", serviceInfo);
+
+        if (serviceMap.containsKey(serviceInfo)) {
+            serverInfo.removeService(serviceInfo);
+            serviceMap.remove(serviceInfo);
+            register(serverInfo);
+        }
     }
 
+    @Override
     public void start() {
         ServerBootstrap bootstrap = new ServerBootstrap();
 
@@ -48,8 +56,9 @@ public class NettyServer extends ServiceRegistry {
         bootstrap.bind(serverInfo.getHost(), serverInfo.getPort());
     }
 
-    public void stop() {
-        close();
+    @Override
+    public void close() {
+        super.close();
         bossGroup.shutdownGracefully();
         workerGroup.shutdownGracefully();
     }

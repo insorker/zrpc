@@ -28,8 +28,16 @@ public class ServerInfo implements Serializable {
         return JSON.parseObject(bytes, ServerInfo.class);
     }
 
+    public String getPath() {
+        return String.valueOf(hashCode());
+    }
+
     public void addService(ServiceInfo serviceInfo) {
         serviceInfoList.add(serviceInfo);
+    }
+
+    public void removeService(ServiceInfo serviceInfo) {
+        serviceInfoList.remove(serviceInfo);
     }
 
     public String getHost() {
