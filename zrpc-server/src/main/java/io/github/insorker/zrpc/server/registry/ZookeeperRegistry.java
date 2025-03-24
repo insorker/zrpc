@@ -6,7 +6,7 @@ import org.apache.curator.framework.state.ConnectionState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ZookeeperRegistry extends ServerRegistry {
+public class ZookeeperRegistry extends Registry {
 
     private static final Logger logger = LoggerFactory.getLogger(ZookeeperRegistry.class);
     private final CuratorClient curatorClient;
@@ -30,9 +30,6 @@ public class ZookeeperRegistry extends ServerRegistry {
 
     @Override
     public void register(ServerInfo serverInfo) {
-        if (this.serverInfo != null) {
-            unregister(serverInfo);
-        }
         this.serverInfo = serverInfo;
 
         try {

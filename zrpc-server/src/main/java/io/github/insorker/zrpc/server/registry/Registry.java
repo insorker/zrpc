@@ -2,7 +2,7 @@ package io.github.insorker.zrpc.server.registry;
 
 import io.github.insorker.zrpc.common.registry.ServerInfo;
 
-public abstract class ServerRegistry {
+public abstract class Registry {
 
     public abstract void register(ServerInfo serverInfo);
 

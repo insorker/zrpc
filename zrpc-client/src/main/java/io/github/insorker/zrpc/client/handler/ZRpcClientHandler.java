@@ -33,6 +33,16 @@ public class ZRpcClientHandler extends SimpleChannelInboundHandler<ZRpcResponse>
         return zRpcFuture;
     }
 
+    public Channel getChannel() {
+        return channel;
+    }
+
+    @Override
+    public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
+        super.channelRegistered(ctx);
+        this.channel = ctx.channel();
+    }
+
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, ZRpcResponse response) throws Exception {
         String requestId = response.getRequestId();
@@ -48,8 +58,8 @@ public class ZRpcClientHandler extends SimpleChannelInboundHandler<ZRpcResponse>
     }
 
     @Override
-    public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
-        super.channelRegistered(ctx);
-        this.channel = ctx.channel();
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        logger.error("Client caught exception {}", cause.getMessage());
+        ctx.close();
     }
 }

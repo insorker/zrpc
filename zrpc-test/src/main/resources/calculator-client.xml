@@ -12,7 +12,7 @@
 
     <context:property-placeholder location="classpath:zrpc.properties"/>
 
-    <bean id="zRpcClient" class="io.github.insorker.zrpc.client.ZRpcClient"
+    <bean id="zRpcClient" class="io.github.insorker.zrpc.client.SingletonDiscoveryClient"
           factory-method="newInstance">
         <constructor-arg name="registryAddress" value="${zrpc.server.registry.address}"/>
     </bean>

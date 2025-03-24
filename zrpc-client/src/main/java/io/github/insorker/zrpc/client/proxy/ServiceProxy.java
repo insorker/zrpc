@@ -1,6 +1,6 @@
 package io.github.insorker.zrpc.client.proxy;
 
-import io.github.insorker.zrpc.client.ZRpcClient;
+import io.github.insorker.zrpc.client.SingletonDiscoveryClient;
 import io.github.insorker.zrpc.client.handler.ZRpcClientHandler;
 import io.github.insorker.zrpc.client.handler.ZRpcFuture;
 import io.github.insorker.zrpc.common.exceptions.ZRpcException;
@@ -33,7 +33,7 @@ public class ServiceProxy<T, R> implements InvocationHandler, ZRpcService<T, R> 
         request.setParameters(args);
 
         try {
-            ZRpcClientHandler handler = ZRpcClient.getInstance().chooseHandler(serviceInfo);
+            ZRpcClientHandler handler = SingletonDiscoveryClient.getInstance().chooseHandler(serviceInfo);
             ZRpcFuture future = handler.sendRequest(request);
             return future.get();
         } catch (Exception e) {
@@ -45,7 +45,7 @@ public class ServiceProxy<T, R> implements InvocationHandler, ZRpcService<T, R> 
     @Override
     public ZRpcFuture call(String functionName, Object... args) throws ZRpcException {
         String serviceName = clazz.getName();
-        ZRpcClientHandler handler = ZRpcClient.getInstance().chooseHandler(new ServiceInfo(serviceName));
+        ZRpcClientHandler handler = SingletonDiscoveryClient.getInstance().chooseHandler(new ServiceInfo(serviceName));
         ZRpcRequest request = new ZRpcRequest(serviceInfo, clazz.getName(), functionName, args);
         return handler.sendRequest(request);
     }
